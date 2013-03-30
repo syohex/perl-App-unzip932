@@ -8,9 +8,7 @@ on test => sub {
 };
 
 on configure => sub  {
-    requires 'Module::Build', '0.38',
-};
-
-on build => sub  {
-    requires 'Module::Build', '0.38',
+    requires 'Module::Build::Pluggable';
+    requires 'Module::Build::Pluggable::GithubMeta';
+    requires 'Module::Build::Pluggable::CPANfile';
 };
