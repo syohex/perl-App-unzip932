@@ -30,6 +30,7 @@ sub parse_options {
     Getopt::Long::GetOptions(
         "p|pipe"        => \$options{pipe},
         "f|from=s"      => \$options{from},
+        "t|to=s"        => \$options{to},
         "l|list"        => \$options{list},
         "n|never"       => \$options{never},
         "x|exclude=s@"  => \@excludes,
@@ -38,7 +39,7 @@ sub parse_options {
         "o|overwrite"   => \$options{overwrite},
     );
 
-    $options{to} = Term::Encoding::term_encoding();
+    $options{to} ||= Term::Encoding::term_encoding();
 
     _validate_options(\%options);
 
