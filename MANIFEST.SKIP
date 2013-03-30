@@ -16,3 +16,5 @@
 MYMETA
 ^README.md$
 ^README.pod$
+\b_build
+^\.travis\.yml$
