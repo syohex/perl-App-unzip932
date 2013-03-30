@@ -7,6 +7,7 @@ use 5.008_001;
 use Archive::Zip;
 use Carp ();
 use Encode ();
+use File::Spec ();
 use Term::Encoding ();
 use Getopt::Long ();
 use List::MoreUtils qw/any/;
@@ -62,7 +63,7 @@ sub _validate_options {
         Carp::croak("Encoding '$options->{from}' is not found");
     }
 
-    unless (-d $options->{dest}) {
+    if ($options->{dest} && ! -d $options->{dest}) {
         Carp::croak("Destination '$options->{dest}' is not found");
     }
 }
@@ -89,7 +90,15 @@ sub run {
 
     my $options = $self->{options};
     for my $filename ( $zip->memberNames ) {
-        my $output_name = Encode::decode($options->{from}, $filename);
+        my $output_name = do {
+            my $path;
+            if ($options->{dest}) {
+                $path = File::Spec::catfile($options->{dest}, $filename);
+            } else {
+                $path = $filename;
+            }
+            Encode::decode($options->{from}, $path);
+        };
 
         next if any { $output_name eq $_ } @{$options->{excludes}};
 
