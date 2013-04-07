@@ -1,6 +1,7 @@
 requires 'Archive::Zip';
 requires 'Term::Encoding';
 requires 'List::MoreUtils';
+requires 'IO::Prompt::Simple';
 
 on test => sub {
     requires 'Test::More', '0.98';
