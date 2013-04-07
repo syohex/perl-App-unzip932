@@ -12,6 +12,7 @@ use Term::Encoding ();
 use Getopt::Long ();
 use List::MoreUtils qw/any/;
 use File::Temp ();
+use IO::Prompt::Simple qw/prompt/;
 
 our $VERSION = '0.01';
 
@@ -89,6 +90,7 @@ sub run {
     my $zip = Archive::Zip->new($self->{zipfile});
     my $tmp = File::Temp->new( UNLINK => 1 );
 
+    my $all_flag = 0;
     my $options = $self->{options};
     for my $filename ( $zip->memberNames ) {
         my $output_name = do {
@@ -110,6 +112,24 @@ sub run {
 
         if ($options->{pipe}) {
             $output_name = $tmp->filename;
+        } else {
+            if (-f $output_name) {
+                if ($options->{never}) {
+                    next;
+                } elsif (!$options->{overwrite} && !$all_flag) {
+                    my $answer = prompt "[y]es, [n]o, [A]ll", {
+                        y => 'yes',
+                        n => 'no',
+                        a => 'all',
+                    };
+
+                    if ($answer eq "all") {
+                        $all_flag = 1;
+                    } elsif ($answer eq "no") {
+                        next;
+                    }
+                }
+            }
         }
 
         $zip->extractMember($filename, $output_name);
