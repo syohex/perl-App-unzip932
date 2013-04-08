@@ -95,20 +95,21 @@ sub run {
     for my $filename ( $zip->memberNames ) {
         my $output_name = do {
             my $path;
+            my $decoded = Encode::decode($options->{from}, $filename);
             if ($options->{dest}) {
-                $path = File::Spec::catfile($options->{dest}, $filename);
+                $path = File::Spec::catfile($options->{dest}, $decoded);
             } else {
-                $path = $filename;
+                $path = $decoded;
             }
-            Encode::decode($options->{from}, $path);
+            Encode::encode($options->{to}, $path);
         };
 
-        next if any { $output_name eq $_ } @{$options->{excludes}};
-
         if ($options->{list}) {
-            print Encode::encode($options->{to}, $output_name), "\n";
+            print "$output_name\n";
             next;
         }
+
+        next if any { $output_name eq $_ } @{$options->{excludes}};
 
         if ($options->{pipe}) {
             $output_name = $tmp->filename;
@@ -133,6 +134,10 @@ sub run {
         }
 
         $zip->extractMember($filename, $output_name);
+
+        unless ($options->{quite}) {
+            print "$output_name\n";
+        }
 
         if ($options->{pipe}) {
             $tmp->autoflush(1);
