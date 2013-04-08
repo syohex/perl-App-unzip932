@@ -23,3 +23,4 @@ syohex
 gmail
 App::unzip932
 CP
+unzip
